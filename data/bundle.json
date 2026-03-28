@@ -1,0 +1,50 @@
+{
+  "lib": "gsap,scrolltrigger,",
+  "gsap": [
+    "c.p8.fromTo(p.current,{\"--width\":1,alignItems:\"flex-end\"},{\"--width\":.8,alignItems:\"flex-end\",duration:.05,scrollTrigger:{trigger:p.current,start:\"bottom 15%\",end:\"bottom top\",scrub:1,scroller:_}})",
+    "c.p8.fromTo(p.current,{\"--width\":.5,alignItems:\"flex-start\"},{\"--width\":1,alignItems:\"flex-start\",duration:.05,scrollTrigger:{trigger:p.current,target:p.current,start:\"top bottom\",end:\"top 60%\",scrub:1,scroller:_}})",
+    "c.p8.set(p.current,{\"--width\":.5})",
+    "c.ZP.fromTo(m.current,{opacity:x?1:0},{opacity:1,duration:x?.1:.6,ease:\"expo.out\",delay:g?0:.25})",
+    "c.ZP.to(m.current,{opacity:0,duration:x?.1:.6,ease:\"expo.out\"})",
+    "s.ZP.fromTo(f.current.reverse()",
+    "l.ZP.to(p.current,{value:e,duration:t,ease:n})",
+    "v.p8.set(E.current,{\"--progress\":e,\"--base-height\":\"\".concat(c-h,\"px\")",
+    "v.p8.to(E.current,{scrollTrigger:{trigger:E.current,target:E.current,start:\"bottom-=\".concat(c-(0===n?f:0)",
+    "v.p8.set(E.current,{\"--progress\":N?e+t*r:(e+t*r)",
+    "v.ZP.fromTo(e.current,{autoAlpha:0},{autoAlpha:1,duration:.5,delay:n?.02:.25,ease:\"power4.inOut\"})",
+    "v.p8.to(h.current,{scaleX:0,duration:.7,delay:.2,ease:\"expo.out\",transformOrigin:\"right center\",onStart:()",
+    "v.p8.set(d.current,{opacity:1,scaleX:0,transformOrigin:\"left center\"})",
+    "v.p8.to(d.current,{scaleX:1,duration:1.2,delay:.2,ease:\"expo.out\",transformOrigin:\"left center\",onStart:()"
+  ],
+  "st": [
+    "scrollTrigger:{trigger:p.current,start:\"bottom 15%\",end:\"bottom top\",scrub:1,scroller:_}",
+    "scrollTrigger:{trigger:p.current,target:p.current,start:\"top bottom\",end:\"top 60%\",scrub:1,scroller:_}",
+    "ScrollTrigger.create({scroller:e.current,trigger:\".modal-container\",start:\"bottom+=\".concat(.1*window.innerHeight,\" bottom\")",
+    "ScrollTrigger.create({scroller:e.current,trigger:\".modal-container\",start:\"top-=\".concat(.9*window.innerHeight,\"px top\")",
+    "ScrollTrigger.create({scroller:e.current,trigger:\".modal-container\",start:\"top bottom\",end:\"bottom top+=1px\",onToggle:e=>{if(!e.isActive)",
+    "scrollTrigger:{trigger:E.current,target:E.current,start:\"bottom-=\".concat(c-(0===n?f:0),\"px bottom\"),end:\"top top\",scrub:1,onUpdate:n=>{let{progress:r}",
+    "ScrollTrigger.create(e,t)"
+  ],
+  "lenis": [],
+  "framer": [],
+  "eases": [
+    "ease:\"expo.out\"",
+    "ease:\"power4.inOut\"",
+    "ease:\"none\"",
+    "ease:\"expo\"",
+    "ease:\"power4\""
+  ],
+  "durs": [
+    "duration:.05",
+    "duration:.8",
+    "duration:.5",
+    "duration:.7",
+    "duration:1.2",
+    "duration:0"
+  ],
+  "delays": [
+    "delay:.1",
+    "delay:.2",
+    "delay:0"
+  ]
+}
