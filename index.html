@@ -640,18 +640,36 @@ scene.add(spot2,spot2.target);
 const rim=new THREE.PointLight(0x6699ff,8,10);
 rim.position.set(2,0,4);scene.add(rim);
 scene.add(new THREE.AmbientLight(0x111122,0.3));
-const pendulum=new THREE.Group();
-pendulum.position.set(0,3.5,0);scene.add(pendulum);
-const chainMat=new THREE.MeshStandardMaterial({color:0xc0c0c0,metalness:1,roughness:0.2});
-const chainLen=18;
-const linkSpacing=0.14;
-for(let i=0;i<chainLen;i++){
-const geo=new THREE.TorusGeometry(0.07,0.02,12,24);
+// Segmented chain - each link is a child of the previous, creating bendable physics
+const chainMat=new THREE.MeshStandardMaterial({color:0xc0c0c0,metalness:1,roughness:0.15});
+const NUM_LINKS=40;
+const LINK_SPACING=0.065;
+const segments=[];
+const segAngles=[];
+const segVels=[];
+// Anchor at top
+const anchor=new THREE.Group();
+anchor.position.set(0,3.5,0);
+scene.add(anchor);
+// Build nested chain - each segment pivots from top of previous
+let parent=anchor;
+for(let i=0;i<NUM_LINKS;i++){
+const seg=new THREE.Group();
+seg.position.set(0,-LINK_SPACING,0);
+const geo=new THREE.TorusGeometry(0.035,0.01,8,20);
 const link=new THREE.Mesh(geo,chainMat);
-link.position.set(0,-i*linkSpacing,0);
 link.rotation.x=i%2===0?Math.PI/2:0;
-pendulum.add(link);
+seg.add(link);
+parent.add(seg);
+parent=seg;
+segments.push(seg);
+segAngles.push({x:0,z:0});
+segVels.push({x:0,z:0});
 }
+// Model attaches to last segment
+const modelGroup=new THREE.Group();
+parent.add(modelGroup);
+let allMeshes=[];
 const loader=new GLTFLoader();
 loader.load('/models/figure.glb',(gltf)=>{
 const model=gltf.scene;
@@ -659,34 +677,37 @@ model.traverse((child)=>{
 if(child.isMesh){
 child.material=new THREE.MeshStandardMaterial({color:0xc0c0c0,metalness:0.95,roughness:0.15,envMapIntensity:1.5});
 child.castShadow=true;
+allMeshes.push(child);
 }});
 const box=new THREE.Box3().setFromObject(model);
 const size=box.getSize(new THREE.Vector3());
 const maxDim=Math.max(size.x,size.y,size.z);
-const scale=2.2/maxDim;
+const scale=2.0/maxDim;
 model.scale.setScalar(scale);
 const center=box.getCenter(new THREE.Vector3());
-model.position.set(-center.x*scale,-chainLen*linkSpacing-center.y*scale-size.y*scale*0.5,-center.z*scale);
-pendulum.add(model);
+model.position.set(-center.x*scale,-LINK_SPACING-size.y*scale*0.5,-center.z*scale);
+modelGroup.add(model);
 });
-let angleX=0,angleZ=0,velX=0,velZ=0;
-const gravity=4.0,damping=0.97,mouseForce=0.04;
+const gravity=6.0,damping=0.96,mouseForce=0.04;
 let prevMX=0,prevMY=0;
 const raycaster=new THREE.Raycaster();
 const mouse=new THREE.Vector2();
+let hitForceX=0,hitForceZ=0;
 canvas.addEventListener('mousemove',(e)=>{
 const rect=canvas.getBoundingClientRect();
 const nx=(e.clientX-rect.left)/rect.width*2-1;
 const ny=-(e.clientY-rect.top)/rect.height*2+1;
 mouse.set(nx,ny);
 raycaster.setFromCamera(mouse,camera);
-const hits=raycaster.intersectObjects(pendulum.children,true);
+const targets=[...allMeshes];
+segments.forEach(s=>s.children.forEach(c=>{if(c.isMesh)targets.push(c)}));
+const hits=raycaster.intersectObjects(targets,true);
 if(hits.length>0){
 const dx=nx-prevMX,dy=ny-prevMY;
 const spd=Math.sqrt(dx*dx+dy*dy);
 const force=mouseForce*(1+spd*7);
-velX+=dx*force*4;
-velZ+=dy*force*2.5;
+hitForceX=dx*force*4;
+hitForceZ=dy*force*2.5;
 }
 prevMX=nx;prevMY=ny;
 });
@@ -698,16 +719,38 @@ camera.aspect=w/h;
 camera.updateProjectionMatrix();
 }
 resize();window.addEventListener('resize',resize);
+const dt=0.016;
 function animate(){
 requestAnimationFrame(animate);
-velX+=(-gravity*Math.sin(angleX))*0.016;
-velZ+=(-gravity*Math.sin(angleZ))*0.016;
-velX*=damping;velZ*=damping;
-angleX+=velX*0.016;angleZ+=velZ*0.016;
-angleX=Math.max(-0.8,Math.min(0.8,angleX));
-angleZ=Math.max(-0.6,Math.min(0.6,angleZ));
-pendulum.rotation.z=angleX;
-pendulum.rotation.x=angleZ;
+// Apply mouse force to bottom third of chain
+for(let i=Math.floor(NUM_LINKS*0.6);i<NUM_LINKS;i++){
+segVels[i].x+=hitForceX*0.3;
+segVels[i].z+=hitForceZ*0.3;
+}
+hitForceX*=0.5;hitForceZ*=0.5;
+// Physics per segment
+for(let i=0;i<NUM_LINKS;i++){
+const stiffness=0.4+0.6*(i/NUM_LINKS);// stiffer at top, looser at bottom
+segVels[i].x+=(-gravity*Math.sin(segAngles[i].x)*stiffness)*dt;
+segVels[i].z+=(-gravity*Math.sin(segAngles[i].z)*stiffness)*dt;
+// Propagate from neighbors
+if(i>0){
+segVels[i].x+=(segAngles[i-1].x-segAngles[i].x)*2*dt;
+segVels[i].z+=(segAngles[i-1].z-segAngles[i].z)*2*dt;
+}
+if(i<NUM_LINKS-1){
+segVels[i].x+=(segAngles[i+1].x-segAngles[i].x)*0.5*dt;
+segVels[i].z+=(segAngles[i+1].z-segAngles[i].z)*0.5*dt;
+}
+segVels[i].x*=damping;
+segVels[i].z*=damping;
+segAngles[i].x+=segVels[i].x*dt;
+segAngles[i].z+=segVels[i].z*dt;
+segAngles[i].x=Math.max(-0.15,Math.min(0.15,segAngles[i].x));
+segAngles[i].z=Math.max(-0.12,Math.min(0.12,segAngles[i].z));
+segments[i].rotation.z=segAngles[i].x;
+segments[i].rotation.x=segAngles[i].z;
+}
 renderer.render(scene,camera);
 }
 animate();
