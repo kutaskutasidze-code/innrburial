@@ -1,0 +1,5 @@
+.vercel
+.next/
+.superpowers/
+chain_link_original.glb
+node_modules/
