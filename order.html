@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>INNRBURIAL — Order</title>
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+<style>
+@font-face { font-family: ABCMonumentGrotesk; src: url("/fonts/font-0.woff") format("woff"), url("/fonts/font-1.woff") format("woff"); font-weight: 400; font-style: normal; font-display: swap; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: #fff;
+  color: #000;
+  font-family: ABCMonumentGrotesk, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: -0.005em;
+}
+a { color: inherit; text-decoration: none; }
+.order-page {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 4rem 1.5rem 5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.order-cover {
+  width: 100%;
+  max-width: 360px;
+  display: block;
+  margin-bottom: 3rem;
+}
+.order-options {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.order-block {
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 1.75rem 0 0;
+}
+.order-block h2 {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.4rem;
+}
+.order-block p {
+  font-size: 12px;
+  opacity: 0.6;
+  margin-bottom: 1rem;
+}
+.order-cta {
+  display: inline-block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 14px 22px;
+  background: #000;
+  color: #fff;
+  transition: opacity 0.3s ease;
+}
+.order-cta:hover { opacity: 0.8; }
+#paypal-container-7G3RGPQZJWQ7G { width: 100%; max-width: 100%; }
+</style>
+</head>
+<body>
+<main class="order-page">
+  <img src="/innr-book-cover.jpg" alt="INNRBURIAL" class="order-cover">
+  <div class="order-options">
+    <div class="order-block">
+      <h2>E-Book — Instant PDF</h2>
+      <p>Download immediately after payment. Delivered by Gumroad to your email.</p>
+      <a href="https://lucaadami.gumroad.com/l/innrburial" target="_blank" rel="noopener" class="order-cta">BUY E-BOOK ↗</a>
+    </div>
+    <div class="order-block">
+      <h2>Print Edition — Worldwide Shipping</h2>
+      <p>Pay via PayPal, Apple Pay, or card. We'll email you within 24 hours to confirm your delivery details.</p>
+      <div id="paypal-container-7G3RGPQZJWQ7G"></div>
+    </div>
+  </div>
+</main>
+<script src="https://www.paypal.com/sdk/js?client-id=BAATntTM8pFdOP-6zGu50npjIdvKtEu6SVagJ7pTg5QyWZu7vjpLQoEc0EsW5bko3IrITtdxgaopj9y9rA&components=hosted-buttons&disable-funding=venmo&currency=USD"></script>
+<script>
+function renderPayPalBtn(){
+  if (typeof paypal !== 'undefined' && paypal.HostedButtons) {
+    try { paypal.HostedButtons({ hostedButtonId: "7G3RGPQZJWQ7G" }).render("#paypal-container-7G3RGPQZJWQ7G"); }
+    catch(e) { console.warn("PayPal error:", e); }
+  } else { setTimeout(renderPayPalBtn, 300); }
+}
+renderPayPalBtn();
+</script>
+</body>
+</html>
