@@ -763,7 +763,7 @@ footer#contact.page_homeSection__TYpWm {
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
 <script>
-const lenis=new Lenis({duration:0.8,easing:t=>Math.min(1,1.001-Math.pow(2,-10*t)),smooth:true});
+const lenis=new Lenis({duration:0.8,easing:t=>Math.min(1,1.001-Math.pow(2,-10*t)),smooth:true,smoothTouch:false,touchMultiplier:0});
 gsap.registerPlugin(ScrollTrigger);
 lenis.on("scroll",ScrollTrigger.update);gsap.ticker.add(t=>lenis.raf(t*1000));gsap.ticker.lagSmoothing(0);
 // Force scroll to top on every page load/refresh
@@ -780,22 +780,22 @@ gsap.fromTo(".projects_placeholderLogo__Bp9Cb",{autoAlpha:0},{autoAlpha:1,y:0,du
 gsap.set(el,{opacity:1,scaleX:0,transformOrigin:"left center"});
 gsap.to(el,{scaleX:1,duration:1.2,delay:0.2,ease:"expo.out"});})();
 document.querySelectorAll('[class*="cover"],[class*="Cover"],[class*="overlay"],[class*="Overlay"]').forEach(el=>{if(el.style)el.style.display="none"});
-// Scroll-driven (1 elements) — restored from first push (commit 898a76a)
-// Kill+recreate strategy: rebuild all row triggers at multiple points so they
-// always use up-to-date measurements (handles late image/font loads + layout drift)
+// Scroll-driven (1 elements) — matches ingamana.com original config
+ScrollTrigger.config({ignoreMobileResize:true});
+var _isMobile=window.innerWidth<1024;
 function _setupRowTriggers(){
-  // Kill any existing row triggers
   ScrollTrigger.getAll().forEach(function(t){
     if (t.vars && t.vars.trigger && t.vars.trigger.classList && t.vars.trigger.classList.contains("Row_row__I_fKs")) {
       t.kill();
     }
   });
+  var baseProgress=_isMobile?0.6:0.5;
   document.querySelectorAll(".Row_row__I_fKs").forEach(function(el,i){
     var h=el.getBoundingClientRect().height||180;var vh=window.innerHeight;
-    var mult=(vh/(Math.floor(h)+20))*(1-0.5);
-    gsap.set(el,{"--progress":0.5,"--base-height":h+"px"});el.style.setProperty("min-height",h+"px");
+    var mult=(vh/(Math.floor(h)+20))*(1-baseProgress);
+    gsap.set(el,{"--progress":baseProgress,"--base-height":h+"px"});el.style.setProperty("min-height",h+"px");
     ScrollTrigger.create({trigger:el,start:"bottom-="+(h-(i===0?42:0))+"px bottom",end:"top top",scrub:1,
-      onUpdate:function(s){gsap.set(el,{"--progress":0.5+mult*s.progress})}});
+      onUpdate:function(s){gsap.set(el,{"--progress":baseProgress+mult*s.progress})}});
   });
 }
 _setupRowTriggers();
