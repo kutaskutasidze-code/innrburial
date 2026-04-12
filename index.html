@@ -1404,8 +1404,8 @@ animate();
 }
 </style>
 
-<!-- Theme Toggle Button -->
-<button class="theme-toggle" onclick="toggleTheme()">Light</button>
+<!-- Theme Toggle Button (kept for static site only — Next.js renders its own React ThemeToggle and removes this one) -->
+<button class="theme-toggle" data-static-toggle="1" onclick="toggleTheme()">Light</button>
 
 <script>
 // ---- Theme Toggle ----
